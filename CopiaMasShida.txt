@@ -1,0 +1,136 @@
+//LEDS
+#define ledAzul 2
+#define ledRojo 6
+#define ledAmarillo 7
+#define ledVerde 8
+//BOTON
+#define boton 9
+//POTENCIOMETRO
+#define pot A0
+
+boolean valorLedAzul =  LOW;
+boolean valorLedRojo =  LOW;
+boolean valorLedAmarillo =  LOW;
+boolean valorLedVerde =  LOW;
+
+boolean flag = false;
+
+long valorPot = 0;
+int cont = 0;
+float valorPotQuarter = 0;
+int contW = 0;
+
+void setup() {
+  pinMode(ledRojo, OUTPUT); //Asignar modo del pin
+  pinMode(ledAmarillo, OUTPUT);
+  pinMode(ledVerde, OUTPUT);
+  pinMode(ledAzul, OUTPUT);
+  pinMode(boton, INPUT_PULLUP);
+
+  Serial.begin(9600); //Inicia puerto serie
+}
+
+void loop() {
+  valorPot = analogRead(pot);
+  valorPot = valorPot * 2;
+  valorPotQuarter = valorPot / 4;
+  semaforo();
+
+  Serial.print(valorPot);
+  Serial.print("\n");
+}
+
+void peaton() {
+  while (digitalRead(boton) == LOW) //Cuando se presiona el boton
+  {
+    flag = true;
+  }
+
+  if (flag == true)
+  {
+    digitalWrite(ledRojo, HIGH);
+    digitalWrite(ledAmarillo, LOW);
+    digitalWrite(ledVerde, LOW);
+
+    for (int i = 0; i < 5; i++) {
+      digitalWrite(ledAzul, HIGH); //Parpadeo azul(peaton)
+      delay(250);
+      digitalWrite(ledAzul, LOW); //Parpadeo azul (peaton)
+      delay(250);
+    }
+    flag = false;
+    digitalWrite(ledRojo, LOW);
+    semaforo();
+  }
+}
+
+void semaforo() {
+
+  peaton();
+  digitalWrite(ledVerde, HIGH); //Inicia verde
+  delay(valorPotQuarter);
+  peaton();
+  delay(valorPotQuarter);
+  peaton();
+  delay(valorPotQuarter);
+  peaton();
+  delay(valorPotQuarter);
+  peaton();
+  delay(valorPotQuarter);
+  peaton();
+  
+
+  /*while(contW < 3){
+    Serial.print(valorPotQuarter);
+    Serial.print("\n");
+    delay(valorPotQuarter);
+    peaton();
+    contW++;
+  }*/
+
+  /*Serial.print("Valor pot: ");
+    Serial.print(valorPot);
+    Serial.print("\nValor quarter: ");
+    Serial.print(valorPotQuarter);
+    Serial.print("\n");
+  */
+
+
+  while (cont < 3)
+  {
+    peaton();
+    digitalWrite(ledVerde, LOW); //Parpadeo cuando se cambia a verde
+    peaton();
+    delay(200);
+    peaton();
+    digitalWrite(ledVerde, HIGH); //Parpadeo cuando se cambia a verde
+    peaton();
+    delay(200);
+    peaton();
+    digitalWrite(ledVerde, LOW); //Parpadeo cuando se cambia a verded
+    peaton();
+    cont = cont + 1;
+  }
+
+  cont = 0;//Reiniciar contador para utilizarlo de nuevo
+
+
+  digitalWrite(ledAmarillo, HIGH); //Inicia amarillo
+  delay(5000);
+
+  while (cont < 3)
+  {
+
+    digitalWrite(ledAmarillo, LOW); //Parpadeo cuando se cambia a amarillo
+    delay(200);
+    digitalWrite(ledAmarillo, HIGH); //Parpadeo cuando se cambia a amarillo
+    delay(200);
+    digitalWrite(ledAmarillo, LOW); //Parpadeo cuando se cambia a amarillo
+    cont = cont + 1;
+  }
+  cont = 0;//Reiniciar contador para utilizarlo de nuevo en el proximo ciclo del arduino
+
+  digitalWrite(ledRojo, HIGH); //Inicia rojo
+  delay(5000);
+  digitalWrite(ledRojo, LOW);
+}
